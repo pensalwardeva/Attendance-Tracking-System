@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "444674696388",
+    "project_id": "attendance-tracking-syst-3384a",
+    "storage_bucket": "attendance-tracking-syst-3384a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444674696388:android:2be97a7b328e1a0c98d591",
+        "android_client_info": {
+          "package_name": "com.example.bizalys_infosystem_assesment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMvRT4ZAaCTozTJqyl-2PAMQBwVDB7w5I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
