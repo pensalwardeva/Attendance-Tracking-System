@@ -15,8 +15,8 @@ class _DashboardViewState extends State<DashboardView> {
   final FirestoreService _firestoreService = FirestoreService();
   Position? _currentPosition;
   bool _isWithinRange = true;
-  Duration logoutGracePeriod = Duration(minutes: 2);
-  Duration checkInterval = Duration(minutes: 5); // Check location every 5 minutes
+  Duration logoutGracePeriod = Duration(minutes: 1);
+  Duration checkInterval = Duration(minutes: 1); // Check location every 5 minutes
 
   @override
   void initState() {
@@ -116,8 +116,8 @@ class _DashboardViewState extends State<DashboardView> {
         designatedPosition,
       );
 
-      // Adjusted the threshold to 100 meters for tolerance
-      if (distance <= 100) {
+      // Adjusted the threshold to 50 meters
+      if (distance <= 50) {
         isWithinRange = true;
         break;
       }
@@ -126,9 +126,9 @@ class _DashboardViewState extends State<DashboardView> {
     // Grace period implementation
     if (!isWithinRange) {
       if (_isWithinRange) {
-        // Start grace period timer
+        // Start grace period timer (1-minute logout delay)
         _isWithinRange = false;
-        await Future.delayed(logoutGracePeriod);
+        await Future.delayed(Duration(minutes: 1));
 
         // Check if the user is still out of range after the grace period
         if (!_isWithinRange) {

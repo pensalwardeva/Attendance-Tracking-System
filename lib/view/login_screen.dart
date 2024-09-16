@@ -1,4 +1,5 @@
 
+
 import 'package:bizalys_infosystem_assesment/view/sign_up_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';

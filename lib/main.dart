@@ -1,5 +1,4 @@
 import 'package:bizalys_infosystem_assesment/provider/auth_provider.dart';
-import 'package:bizalys_infosystem_assesment/provider/location_provider.dart';
 import 'package:bizalys_infosystem_assesment/view/home_screen.dart';
 import 'package:bizalys_infosystem_assesment/view/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +18,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => LocationProvider()),
       ],
       child: MaterialApp(
         title: 'GPS Time Tracking System',
