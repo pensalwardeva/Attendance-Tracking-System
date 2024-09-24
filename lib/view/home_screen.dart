@@ -15,14 +15,11 @@ class _DashboardViewState extends State<DashboardView> {
   final FirestoreService _firestoreService = FirestoreService();
   Position? _currentPosition;
   bool _isWithinRange = true;
-  Duration logoutGracePeriod = Duration(minutes: 1);
-  Duration checkInterval = Duration(minutes: 1); // Check location every 5 minutes
 
   @override
   void initState() {
     super.initState();
     _checkLocationAndStartTracking();
-    _checkLocationPeriodically(); // Start periodic location checking
   }
 
   Future<void> _checkLocationAndStartTracking() async {
@@ -116,49 +113,32 @@ class _DashboardViewState extends State<DashboardView> {
         designatedPosition,
       );
 
-      // Adjusted the threshold to 50 meters
+      // Check if the user is within 50 meters of any designated location
       if (distance <= 50) {
         isWithinRange = true;
         break;
       }
     }
 
-    // Grace period implementation
+    // If the user is beyond 50 meters, show a warning
     if (!isWithinRange) {
-      if (_isWithinRange) {
-        // Start grace period timer (1-minute logout delay)
-        _isWithinRange = false;
-        await Future.delayed(Duration(minutes: 1));
-
-        // Check if the user is still out of range after the grace period
-        if (!_isWithinRange) {
-          await _auth.signOut();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Login(),
-            ),
-          );
-        }
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You are beyond 50 meters from your designated location.'),
+          backgroundColor: Colors.orangeAccent,
+        ),
+      );
     } else {
-      _isWithinRange = true; // User is back in range
+      _isWithinRange = true; // Allow normal operations
     }
   }
 
-  // Periodically check location every 5 minutes
-  Future<void> _checkLocationPeriodically() async {
-    while (true) {
-      await Future.delayed(checkInterval); // Wait for the specified interval
-      await _checkUserLocation();
-    }
-  }
-
-  Future<void> _saveNewLocation() async {
+  // Save the current location as an office location
+  Future<void> _saveOfficeLocation() async {
     if (_currentPosition == null) return;
 
-    final newLocation = {
-      'type': 'client', // or 'office' based on context
+    final newOfficeLocation = {
+      'type': 'office', // Mark this as an office location
       'latitude': _currentPosition!.latitude,
       'longitude': _currentPosition!.longitude,
     };
@@ -166,8 +146,8 @@ class _DashboardViewState extends State<DashboardView> {
     bool saveLocation = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Save New Location'),
-        content: Text('Do you want to save this new location?'),
+        title: Text('Save Office Location'),
+        content: Text('Do you want to save this location as an office?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -182,7 +162,10 @@ class _DashboardViewState extends State<DashboardView> {
     );
 
     if (saveLocation) {
-      await _firestoreService.saveNewLocation(newLocation);
+      await _firestoreService.saveNewLocation(newOfficeLocation); // Save to Firestore
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Office location saved successfully.')),
+      );
     }
   }
 
@@ -190,7 +173,10 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dashboard',style: TextStyle(color: Colors.white),),
+        title: Text(
+          'Dashboard',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
         elevation: 0,
@@ -240,13 +226,13 @@ class _DashboardViewState extends State<DashboardView> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
                 ),
                 child: Text('Check Location'),
               ),
               SizedBox(height: 24.0),
               ElevatedButton(
-                onPressed: _saveNewLocation,
+                onPressed: _saveOfficeLocation,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.greenAccent,
                   shape: RoundedRectangleBorder(
@@ -254,7 +240,7 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
                 ),
-                child: Text('Save New Location'),
+                child: Text('Save Office Location'),
               ),
             ],
           ),
